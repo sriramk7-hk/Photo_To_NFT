@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { Blob, NFTStorage } from "nft.storage";
 import { ethers } from "ethers";
-import { abiM, contractAddressM } from "constants/constants";
+import { abiG, contractAddressG } from "constants/constants";
 
 const nftapi = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweEIzNGVFN0ZjMzUxOTcwMjZEOTQ3Yzk2NkM4MGY5RDc4Q0FmZDhEMjciLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY3ODk4MjkyMzc2MiwibmFtZSI6IlByb2plY3RfMSJ9.yltH4xETYrpHOyAogkPvo3YGCegeeGyqUoRRDPnMWEg"
 
@@ -15,6 +15,8 @@ export default function UploadFile() {
     const [tokenURILink, setTokenURILink] = useState("");
     const [imageIPFS, setImageIPFS] = useState("");
     const [tokenURI, setTokenURI] = useState("");
+    const [upload, setUpload] = useState("");
+    const [mint, setMint] = useState("");
     let tokenURITemplate = {
       "title": "Asset Metadata",
       "type": "object",
@@ -59,12 +61,13 @@ export default function UploadFile() {
       const client = new NFTStorage({token: nftapi});
       const blob = new Blob([JSON.stringify(tokenURIMetaData)], {"type": "application/json"})
       const data = await client.storeBlob(blob)
-
-      console.log(data);
       
       let tokenURIURL = `https://ipfs.io/ipfs/${data}`;
 
       console.log(tokenURIURL)
+      setUpload(true);
+      
+
       setTokenURILink(tokenURIURL)
       let tokenURIG = `ipfs://${data}`
       setTokenURI(tokenURIG);
@@ -73,38 +76,48 @@ export default function UploadFile() {
     const handleMint = async () => {
       const providers = new ethers.providers.Web3Provider(window.ethereum);
       const signers = providers.getSigner();
-      const contract = new ethers.Contract(contractAddressM, abiM, signers);
+      const contract = new ethers.Contract(contractAddressG, abiG, signers);
       try {
         console.log("Minting Tokens")
         const transResp = await contract.mint(tokenURI);
         await transResp.wait(1);
         console.log("Token Minted");
+        setMint(true)
         console.log(transResp)
       } catch (error) {
         console.log(error);
       }
     }
     return(
-        <div className="flex flex-col items-center p-10 space-y-6">
-            <img src={viewImage} alt="Upload file within 100MB" height="100" width="100"></img>
+        <div className="flex flex-row justify-center">
+            <div className=" items-start space-y-6 p-10">
+            <div className="text-center  text-slate-500">
+            <img src={viewImage} alt="Upload File by choosing file below" className="h-[280px] w-[230px] rounded-md border-4 border-gray-800"/>
+            </div>
             
-            <input type="text" onChange={(event) => {
+            <input type="text" placeholder="Type name" onChange={(event) => {
                 setText(event.target.value);
-              }}/>
-              <input type="text" onChange={(event) => {
+              }} className="placeholder:italic placeholder:text-slate-500 border-4 border-gray-800 rounded-md w-[230px]"/>
+              <textarea type="text" placeholder="Type in Description" onChange={(event) => {
                 setDescription(event.target.value)
-              }}/>
-              <input type="file" name="SelectImage"  onChange={({target})=>{
+              }} className="flex  placeholder:italic placeholder:text-slate-500 border-4 border-gray-800 rounded-md w-[230px] h-[100px]"/>
+              <input hidden type="file" id="file" onChange={({target})=>{
               if(target.files){
                 const file = target.files[0];
                 setViewImage(URL.createObjectURL(file));
                 setSelectImage(file);
               }
-              }} />
-              <a href={imageIPFS}>ImageLink</a>
-              <a href={tokenURILink}>TokenMetaDatLink</a>
-              <button onClick={handleFiles}>Upload</button>
-              <button onClick={handleMint}>Mint</button>
+              }}/>
+              <label for="file" className="flex justify-center items-center border-4  border-gray-800 rounded-2xl h-[40px] w-[170px]">
+                Choose Photo
+              </label>
+            </div>
+            <div className="flex flex-col p-10 space-y-6">
+              <button onClick={handleFiles} className="border-4 border-gray-800 rounded-2xl h-[40px] w-[170px]">{upload?<>Uploaded</>:<>Upload</>}</button>
+              <button onClick={handleMint} className="border-4 border-gray-800 rounded-2xl h-[40px] w-[170px]">{mint?<>Minted</>:<>Mint</>}</button>
+              <a href={imageIPFS} className="bold text-2xl color text-blue-600">Image URL</a>
+              <a href={tokenURILink} className="bold text-2xl text-blue-600">Token URI</a>
+            </div>
         </div>
     )
 }
