@@ -3,6 +3,7 @@ require("hardhat-deploy");
 require("dotenv").config();
 
 const GOERLI_RPC_URL = process.env.GOERLI_RPC_URL;
+const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const MANTLE_TESTNET_RPC_URL = process.env.MANTLE_TESTNET_RPC_URL;
 
@@ -31,6 +32,13 @@ module.exports = {
       chainId: 5001,
       blockConfirmations: 1
     },
+
+    sepolia: {
+      url: SEPOLIA_RPC_URL,
+      accounts: [PRIVATE_KEY],
+      chainId: 11155111,
+      blockConfirmations: 1,
+    }
   },
 
   namedAccounts: {

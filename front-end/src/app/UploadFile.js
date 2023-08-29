@@ -1,8 +1,10 @@
+"use client";
+
 import { useState } from "react";
 import axios from "axios";
 import { Blob, NFTStorage } from "nft.storage";
 import { ethers } from "ethers";
-import { abiS, contractAddressS } from "constants/constants";
+import { abiS, contractAddressS } from "../../constants/constants";
 
 const nftapi = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweEIzNGVFN0ZjMzUxOTcwMjZEOTQ3Yzk2NkM4MGY5RDc4Q0FmZDhEMjciLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY3ODk4MjkyMzc2MiwibmFtZSI6IlByb2plY3RfMSJ9.yltH4xETYrpHOyAogkPvo3YGCegeeGyqUoRRDPnMWEg"
 
@@ -40,8 +42,9 @@ export default function UploadFile() {
 
     const handleFiles = async () => {
       if(!selectedImage) return
+      console.log(selectedImage);
       const formData = new FormData();
-      formData.append("File", selectedImage, text.toString());
+      formData.set("file", selectedImage);
       const res = await axios.post("/api/saveFile", formData);
       console.log(res)
 
@@ -108,7 +111,7 @@ export default function UploadFile() {
                 setSelectImage(file);
               }
               }}/>
-              <label for="file" className="flex justify-center items-center border-4  border-gray-800 rounded-2xl h-[40px] w-[170px]">
+              <label htmlFor="file" className="flex justify-center items-center border-4  border-gray-800 rounded-2xl h-[40px] w-[170px]">
                 Choose Photo
               </label>
             </div>
